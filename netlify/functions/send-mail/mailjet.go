@@ -51,13 +51,13 @@ func sendMailjetEmail(form ContactForm, cfg Config) (string, error) {
 		return "", fmt.Errorf("error creating request payload: %v", err)
 	}
 
-	// Prepare the Mailjet API request.
 	mailjetURL := "https://api.mailjet.com/v3.1/send"
 	reqMailjet, err := http.NewRequest("POST", mailjetURL, bytes.NewBuffer(jsonBody))
 	if err != nil {
 		return "", fmt.Errorf("error creating Mailjet request: %v", err)
 	}
 	reqMailjet.Header.Set("Content-Type", "application/json")
+	// Basic Auth: "Basic " + base64(apiKey:secretKey)
 	auth := base64.StdEncoding.EncodeToString([]byte(fmt.Sprintf("%s:%s", cfg.MailjetAPIKey, cfg.MailjetSecretKey)))
 	reqMailjet.Header.Set("Authorization", "Basic "+auth)
 
@@ -68,7 +68,6 @@ func sendMailjetEmail(form ContactForm, cfg Config) (string, error) {
 	}
 	defer resp.Body.Close()
 
-	// Check for errors returned by Mailjet.
 	if resp.StatusCode != http.StatusOK {
 		bodyBytes, _ := io.ReadAll(resp.Body)
 		return "", fmt.Errorf("mailjet error: %s", string(bodyBytes))
