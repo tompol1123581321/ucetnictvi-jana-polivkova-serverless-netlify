@@ -1,2 +1,8 @@
 [build]
   functions = "netlify/functions"
+
+[[redirects]]
+  from = "/send-email"
+  to = "/.netlify/functions/send-email"
+  status = 200
+  force = true
